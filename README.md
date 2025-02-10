@@ -1,27 +1,51 @@
-# マルチモデルチャットボット
+# MultiModelChat - マルチモデルチャットボット
 
-このプロジェクトは、LangChainを使用して複数のAIモデルに対応したチャットボットを実装したものです。OpenAI、Google、Anthropic、DeepSeekの各種モデルを切り替えて使用することができます。
+複数のAIモデルを切り替えて使用できるインタラクティブなチャットボットです。
 
-## 特徴
+## 機能
 
-- 複数のAIプロバイダーに対応
-  - OpenAI (GPT-4o, GPT-4o-mini, GPT-4 Turbo, GPT-4, GPT-3.5 Turbo)
-  - Google (Gemini Pro)
-  - Anthropic (Claude 3.5 Sonnet, Claude 3.5 Haiku, Claude 3 Opus, Claude 3 Sonnet, Claude 3 Haiku)
-  - DeepSeek (V3, R1)
-- 対話履歴の保持（最新10件）
-- 簡単なモデル切り替え機能
-- エラーハンドリング機能
-- チャットログの自動保存
-  - 日付ごとに別ファイルで保存
-  - タイムスタンプ、ロール、モデル名、内容を記録
-  - JSONフォーマットで保存
+- 複数のAIプロバイダーのモデルをシームレスに切り替え
+- 対話履歴の管理（サイズ制限、保存、表示）
+- 詳細なログ機能
+- 使いやすいコマンドインターフェース
 
-## 必要条件
+## コマンド
 
-- Node.js (v16以上推奨)
-- npm
-- 各AIプロバイダーのAPIキー
+全てのコマンドは `/` で始まります（バックスラッシュ `\` ではありません）：
+
+- `/model <プロバイダー> <モデル名>`: モデルを切り替えます
+  - 例: `/model anthropic claude-3-opus`
+- `/models`: 利用可能なモデルの一覧を表示
+- `/current`: 現在使用中のモデルを表示
+- `/history_size <数値>`: 対話履歴の保存数を設定
+  - 例: `/history_size 20`
+- `/history_info`: 現在の対話履歴の設定を表示
+- `/help`: このヘルプを表示
+- `/quit`: プログラムを終了
+
+## 利用可能なモデル
+
+### OpenAI
+- gpt-4o
+- gpt-4o-mini
+- gpt-4-turbo
+- gpt-4
+- gpt-3.5-turbo
+
+### Google
+- gemini-2.0-flash
+- gemini-1.5-flash
+- gemini-1.5-pro
+
+### Anthropic
+- claude-3.5-sonnet (claude-3-5-sonnet-20241022)
+- claude-3.5-haiku (claude-3-5-haiku-20241022)
+- claude-3-opus (claude-3-opus-20240229)
+- claude-3-sonnet (claude-3-sonnet-20240229)
+- claude-3-haiku (claude-3-haiku-20240307)
+
+### DeepSeek
+- v3 (deepseek-chat): 最新の汎用チャットモデル
 
 ## セットアップ
 
@@ -29,7 +53,7 @@
 
 2. 必要なパッケージをインストール
 ```bash
-npm install @langchain/openai @langchain/google-genai @langchain/anthropic @langchain/core dotenv uuid
+npm install
 ```
 
 3. 環境変数の設定
@@ -43,28 +67,9 @@ DEEPSEEK_API_KEY=<your-deepseek-api-key>
 
 ## 使用方法
 
-1. プログラムの起動
 ```bash
-node MyChatbot.js
+node --no-deprecation MyChatbot.js
 ```
-
-2. コマンド
-全てのコマンドは `/` で始まります（バックスラッシュ `\` ではありません）：
-
-- `/model <プロバイダー> <モデル名>`: モデルを切り替えます
-  - 例: `/model anthropic claude-3-opus`
-- `/models`: 利用可能なモデルの一覧を表示
-- `/current`: 現在使用中のモデルを表示
-- `/history_size <数値>`: 対話履歴の保存数を設定
-  - 例: `/history_size 20`
-- `/history_info`: 現在の対話履歴の設定を表示
-- `/help`: このヘルプを表示
-- `/quit`: プログラムを終了
-
-3. チャット
-- 通常のチャットは、直接メッセージを入力するだけです
-- プログラムは対話履歴を保持し、文脈を理解した応答を返します
-- プロンプトには現在使用中のモデル名が表示されます（例：`[openai/gpt-4] 入力してください > `）
 
 ## ログ機能
 
@@ -124,66 +129,16 @@ node MyChatbot.js
         "content": "こんにちは！お手伝いできることはありますか？"
       }
     }
-  },
-  {
-    "timestamp": "2025-02-10T06:15:12.789Z",
-    "model": {
-      "provider": "openai",
-      "model": "gpt-4"
-    },
-    "request": {
-      "timestamp": "2025-02-10T06:15:12.789Z",
-      "model": "gpt-4",
-      "prompts": ["AIについて教えてください"]
-    },
-    "response": {
-      "timestamp": "2025-02-10T06:15:14.123Z",
-      "duration": 1334,
-      "output": {
-        "content": "AIは人工知能（Artificial Intelligence）の略称で..."
-      }
-    }
   }
 ]
 ```
-
-## 利用可能なモデル一覧
-
-### OpenAI
-実験的モデル:
-- gpt-4o
-- gpt-4o-mini
-
-通常モデル:
-- gpt-4-turbo
-- gpt-4
-- gpt-3.5-turbo
-
-注: 推論モード（O1シリーズ）のモデル（o1, o1-mini, o3-mini）は、OpenAIのAPI利用者の中でも、使用量Tier 3-5の一部ユーザーにのみ提供されています。
-
-### Google
-- gemini-2.0-flash (最新のFlashモデル)
-- gemini-1.5-flash (高速な推論に最適化)
-- gemini-1.5-pro (高性能な汎用モデル)
-
-### Anthropic
-Claude 3.5シリーズ:
-- claude-3-5-sonnet (claude-3-5-sonnet-20241022)
-- claude-3-5-haiku (claude-3-5-haiku-20241022)
-
-Claude 3シリーズ:
-- claude-3-opus (claude-3-opus-20240229)
-- claude-3-sonnet (claude-3-sonnet-20240229)
-- claude-3-haiku (claude-3-haiku-20240307)
-
-### DeepSeek
-- v3 (deepseek-chat): 最新の汎用チャットモデル
 
 ## 注意事項
 
 - 各モデルを使用するには、対応するAPIキーが必要です
 - APIの利用料金は各プロバイダーの料金体系に従います
 - 対話履歴は最新10件のみメモリに保持され、プログラム終了時に消去されます
+- OpenAIの推論モード（O1シリーズ）のモデルは、使用量Tier 3-5の一部ユーザーにのみ提供されています
 
 ## エラー対処
 
@@ -195,10 +150,6 @@ Claude 3シリーズ:
 - 正しいプロバイダー名とモデル名を指定しているか確認
 - `/models`コマンドで利用可能なモデルを確認
 
-## ライセンス
-
-MITライセンス
-
 ## 参考資料
 
 - [LangChain JavaScript Documentation](https://js.langchain.com/docs)
@@ -206,3 +157,7 @@ MITライセンス
 - [Google AI Documentation](https://ai.google.dev/)
 - [Anthropic API Documentation](https://docs.anthropic.com/claude/docs)
 - [DeepSeek API Documentation](https://platform.deepseek.com/docs)
+
+## ライセンス
+
+MIT License - 詳細は[LICENSE](LICENSE)ファイルを参照してください。
